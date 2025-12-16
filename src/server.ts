@@ -29,6 +29,8 @@ import { TokenPayload } from "./types";
 import accountController from "./controllers/account.controller";
 import { topupSchema, updateProfileSchema } from "./schemas";
 import path from "path";
+import serviceController from "./controllers/service.controller";
+import bannerController from "./controllers/banner.controller";
 
 const uploadDir = path.join(__dirname, "uploads");
 
@@ -87,6 +89,10 @@ app.put(
   upload.single("file"),
   accountController.uploadProfileImage
 );
+
+app.get("/banners", authenticateJWT, asyncHandler(bannerController.list));
+
+app.get("/services", authenticateJWT, asyncHandler(serviceController.list));
 
 app.get(
   "/get-balance",

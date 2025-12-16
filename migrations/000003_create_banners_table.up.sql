@@ -1,0 +1,6 @@
+CREATE TABLE banners (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(128) NOT NULL,
+    image VARCHAR(128) NOT NULL,
+    description VARCHAR(255) NOT NULL
+);

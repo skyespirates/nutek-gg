@@ -59,6 +59,26 @@ export interface Balance {
   balance: number;
 }
 
+export interface Service {
+  id: number;
+  code: string;
+  name: string;
+  icon?: string;
+  tariff: number;
+}
+
+export interface Banner {
+  name: string;
+  image: string;
+  description: string;
+}
+
+export interface BannerResp {
+  banner_name: string;
+  banner_image: string;
+  banner_description: string;
+}
+
 export interface Item {
   id_product: number;
   name: string;
