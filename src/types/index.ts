@@ -34,6 +34,7 @@ export interface Account {
   last_name: string;
   password: string;
   balance: number;
+  profile_image?: string;
 }
 
 export interface NewAccount {
@@ -44,7 +45,14 @@ export interface NewAccount {
 }
 
 export interface LoginResponse {
-  access_token: string;
+  token: string;
+}
+
+export interface Profile {
+  email: string;
+  first_name: string;
+  last_name: string;
+  profile_image: string;
 }
 
 export interface Balance {

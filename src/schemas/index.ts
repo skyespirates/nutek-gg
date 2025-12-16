@@ -29,3 +29,8 @@ export const topupSchema = z.object({
 export const newAccountSchema = z.object({
   name: z.string(),
 });
+
+export const updateProfileSchema = z.object({
+  first_name: z.string(),
+  last_name: z.string(),
+});

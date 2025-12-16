@@ -1,4 +1,4 @@
-import { Account, Balance, NewAccount } from "../types";
+import { Account, Balance, NewAccount, Profile } from "../types";
 import logger from "../utils/logger";
 import pool from "../infra/db";
 import { PoolClient } from "pg";
@@ -35,6 +35,41 @@ async function getAccountByEmail(email: string): Promise<Account> {
   }
 }
 
+async function updateProfile(
+  first_name: string,
+  last_name: string,
+  email: string
+): Promise<Profile> {
+  try {
+    const result = await pool.query<Profile>(
+      "UPDATE accounts SET first_name = $1, last_name = $2 WHERE email = $3 RETURNING email, first_name, last_name, profile_image",
+      [first_name, last_name, email]
+    );
+    return result.rows[0];
+  } catch (error) {
+    logger.error(error);
+    throw error;
+  }
+}
+
+async function updateProfileImage(
+  image_url: string,
+  email: string
+): Promise<Profile | null> {
+  try {
+    const result = await pool.query<Profile>(
+      "UPDATE accounts SET profile_image = $1 WHERE email = $2 RETURNING email, first_name, last_name, profile_image",
+      [image_url, email]
+    );
+    if (result.rowCount == 0) {
+      return null;
+    }
+    return result.rows[0];
+  } catch (error) {
+    logger.error(error);
+    throw error;
+  }
+}
 async function getBalance(email: string): Promise<Balance> {
   try {
     const result = await pool.query<Balance>(
@@ -64,4 +99,11 @@ async function topup(email: string, amount: number): Promise<boolean> {
   }
 }
 
-export default { createAccount, getBalance, topup, getAccountByEmail };
+export default {
+  createAccount,
+  getBalance,
+  topup,
+  getAccountByEmail,
+  updateProfile,
+  updateProfileImage,
+};

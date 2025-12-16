@@ -18,7 +18,7 @@ const login = async (req: Request, res: Response) => {
 
     let isMatch = await bcrypt.compare(password, account.password);
     if (!isMatch) {
-      failure(res, "invalid email or password", 401);
+      failure(res, "Username atau password salah", 401);
       return;
     }
     const payload: TokenPayload = {
@@ -27,11 +27,11 @@ const login = async (req: Request, res: Response) => {
     };
     const token = jwt.generateToken(payload);
     const response: LoginResponse = {
-      access_token: token,
+      token,
     };
-    success<LoginResponse>(res, 200, "login successfully", response);
+    success<LoginResponse>(res, 200, "Login Sukses", response);
   } catch (error) {
-    failure(res, "failed to login", 500);
+    failure(res, "Parameter email tidak sesuai format", 400);
     logger.error(error);
   }
 };

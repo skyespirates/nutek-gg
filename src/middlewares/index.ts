@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from "express";
+import { Request, Response, NextFunction, ErrorRequestHandler } from "express";
 import { z, ZodError } from "zod";
 
 import { StatusCodes } from "http-status-codes";
@@ -6,6 +6,8 @@ import { failure } from "../utils/response";
 import jwt from "jsonwebtoken";
 import logService from "../services/log.service";
 import logger from "../utils/logger";
+import multer from "multer";
+import { TokenPayload } from "../types";
 
 export function validateData(schema: z.ZodObject<any, any>) {
   return (req: Request, res: Response, next: NextFunction) => {
@@ -44,14 +46,14 @@ export function authenticateJWT(
   if (token) {
     jwt.verify(token, secret_key, (err, payload) => {
       if (err) {
-        failure(res, "invalid token", 401);
+        failure(res, "Token tidak tidak valid atau kadaluwarsa", 401);
         return;
       }
-      req.user = payload;
+      req.user = payload as TokenPayload;
       next();
     });
   } else {
-    failure(res, "invalid token", 401);
+    failure(res, "Token tidak tidak valid atau kadaluwarsa", 401);
   }
 }
 
@@ -75,3 +77,20 @@ export function logging(req: Request, res: Response, next: NextFunction) {
   });
   next();
 }
+
+export const errorHandler: ErrorRequestHandler = (
+  err: any,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  if (err instanceof multer.MulterError) {
+    failure(res, "Error multer cokkkk🥶");
+  }
+
+  if (err) {
+    failure(res, "Format Image tidak sesuai");
+  }
+
+  next();
+};

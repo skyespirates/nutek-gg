@@ -4,5 +4,6 @@ CREATE TABLE accounts (
     first_name VARCHAR(128) NOT NULL,
     last_name VARCHAR(128) NOT NULL,
     password VARCHAR(255) NOT NULL,
-    balance INT DEFAULT 0
+    balance INT DEFAULT 0,
+    profile_image VARCHAR(255)
 );

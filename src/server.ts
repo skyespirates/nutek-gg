@@ -1,8 +1,21 @@
 import "dotenv/config";
-import express, { Request, Response } from "express";
+import express, {
+  NextFunction,
+  Request,
+  Response,
+  ErrorRequestHandler,
+} from "express";
 import logger from "./utils/logger";
-import { authenticateJWT, logging, validateData } from "./middlewares";
+import {
+  authenticateJWT,
+  errorHandler,
+  logging,
+  validateData,
+} from "./middlewares";
 import { JwtPayload } from "jsonwebtoken";
+import multer from "multer";
+
+import asyncHandler from "express-async-handler";
 
 // routes
 import authRoutes from "./routes/auth";
@@ -14,7 +27,34 @@ import transferRoutes from "./routes/transfer.route";
 import { failure } from "./utils/response";
 import { TokenPayload } from "./types";
 import accountController from "./controllers/account.controller";
-import { topupSchema } from "./schemas";
+import { topupSchema, updateProfileSchema } from "./schemas";
+import path from "path";
+
+const uploadDir = path.join(__dirname, "uploads");
+
+const allowedMimeTypes = ["image/jpeg", "image/png"];
+const allowedExtensions = [".jpg", ".jpeg", ".png"];
+
+const storage = multer.diskStorage({
+  destination: uploadDir,
+  filename: function (req, file, cb) {
+    cb(null, file.originalname);
+  },
+});
+
+const upload = multer({
+  storage: storage,
+  fileFilter: (req, file, cb) => {
+    const ext = path.extname(file.originalname).toLowerCase();
+    const mime = file.mimetype;
+
+    if (allowedMimeTypes.includes(mime) && allowedExtensions.includes(ext)) {
+      cb(null, true);
+    } else {
+      cb(new Error("Only JPEG and PNG images are allowed"));
+    }
+  },
+});
 
 const app = express();
 const port = process.env.PORT || 8080;
@@ -22,18 +62,38 @@ const port = process.env.PORT || 8080;
 app.use(logging);
 app.use(express.json());
 
+app.use(express.static(uploadDir));
+
 // #1 autentikasi dengan 2 metode login, basic dan otp
 app.use("/auth", authRoutes);
 
 // #2 running number
 app.use("/runner", runnerRoutes);
 
-// #6 endpoint dengan lebih dari 2 query
-app.use("/transfer", transferRoutes);
-
 app.use("/registration", accountRoutes);
 
-app.get("/get-balance", authenticateJWT, accountController.getBalance);
+app.get("/profile", authenticateJWT, accountController.getProfile);
+
+app.put(
+  "/profile/update",
+  authenticateJWT,
+  validateData(updateProfileSchema),
+  accountController.updateProfile
+);
+
+app.put(
+  "/profile/image",
+  authenticateJWT,
+  upload.single("file"),
+  accountController.uploadProfileImage
+);
+
+app.get(
+  "/get-balance",
+  authenticateJWT,
+  asyncHandler(accountController.getBalance)
+);
+
 app.post(
   "/topup",
   authenticateJWT,
@@ -41,14 +101,11 @@ app.post(
   accountController.topup
 );
 
-// #7 data laporan jumlah request user per jam
-app.use("/rph", requestRoutes);
-
-app.use("/protected", authenticateJWT, protectedRoutes);
-
 app.get("/", (req: Request, res: Response) => {
   res.send("Hello, World!");
 });
+
+app.use(errorHandler);
 
 app.listen(port, () => {
   logger.info(`Server is running on http://localhost:${port}`);
