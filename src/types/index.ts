@@ -79,6 +79,47 @@ export interface BannerResp {
   banner_description: string;
 }
 
+export interface Payment {
+  invoice_number: string;
+  service_code: string;
+  service_name: string;
+  transaction_type: string;
+  total_amount: number;
+  created_on: Date;
+}
+
+export interface TransactionPayload {
+  email: string;
+  service_code: string;
+  invoice_number: string;
+}
+
+export interface InvoicePayload {
+  transaction_type: string;
+  total_amount: number;
+  description: string;
+}
+
+export interface InvoiceResp {
+  invoice_number: string;
+  transaction_type: string;
+  created_on: Date;
+}
+
+export interface History {
+  invoice_number: string;
+  transaction_type: string;
+  description: string;
+  total_amount: number;
+  created_on: Date;
+}
+
+export interface TransactionResult {
+  invoice_number: string;
+  transaction_type: string;
+  created_on: Date;
+}
+
 export interface Item {
   id_product: number;
   name: string;

@@ -27,10 +27,11 @@ import transferRoutes from "./routes/transfer.route";
 import { failure } from "./utils/response";
 import { TokenPayload } from "./types";
 import accountController from "./controllers/account.controller";
-import { topupSchema, updateProfileSchema } from "./schemas";
+import { paymentSchema, topupSchema, updateProfileSchema } from "./schemas";
 import path from "path";
 import serviceController from "./controllers/service.controller";
 import bannerController from "./controllers/banner.controller";
+import transactionController from "./controllers/transaction.controller";
 
 const uploadDir = path.join(__dirname, "uploads");
 
@@ -94,6 +95,14 @@ app.get("/banners", authenticateJWT, asyncHandler(bannerController.list));
 
 app.get("/services", authenticateJWT, asyncHandler(serviceController.list));
 
+app.get("/sync", (req, res) => {
+  throw new Error("error sync");
+});
+
+app.get("/async", async (req, res) => {
+  throw new Error("error async");
+});
+
 app.get(
   "/get-balance",
   authenticateJWT,
@@ -105,6 +114,20 @@ app.post(
   authenticateJWT,
   validateData(topupSchema),
   accountController.topup
+);
+
+app.post(
+  "/transaction",
+  authenticateJWT,
+  validateData(paymentSchema),
+  accountController.payment
+);
+
+app.get(
+  "/transaction/history",
+  authenticateJWT,
+  validateData(paymentSchema),
+  transactionController.list
 );
 
 app.get("/", (req: Request, res: Response) => {

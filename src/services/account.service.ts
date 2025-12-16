@@ -83,13 +83,17 @@ async function getBalance(email: string): Promise<Balance> {
   }
 }
 
-async function topup(email: string, amount: number): Promise<boolean> {
+async function topup(
+  conn: PoolClient,
+  email: string,
+  amount: number
+): Promise<boolean> {
   try {
-    const result = await pool.query(
+    const result = await conn.query(
       "UPDATE accounts SET balance = balance + $1 WHERE email = $2",
       [amount, email]
     );
-    if (result.rowCount == 0) {
+    if (!result.rowCount) {
       return false;
     }
     return true;
@@ -99,10 +103,26 @@ async function topup(email: string, amount: number): Promise<boolean> {
   }
 }
 
+async function payment(
+  conn: PoolClient,
+  email: string,
+  amount: number
+): Promise<boolean> {
+  const result = await conn.query(
+    "UPDATE accounts SET balance = balance - $1 WHERE email = $2",
+    [amount, email]
+  );
+  if (!result.rowCount) {
+    return false;
+  }
+  return true;
+}
+
 export default {
   createAccount,
   getBalance,
   topup,
+  payment,
   getAccountByEmail,
   updateProfile,
   updateProfileImage,

@@ -1,21 +1,33 @@
-import logger from "../utils/logger";
-import { PoolConnection } from "mysql2/promise";
+import { PoolClient } from "pg";
+import { TransactionPayload, TransactionResult, History } from "../types";
+import pool from "../infra/db";
 
-async function logTransaction(
-  conn: PoolConnection,
-  senderId: string,
-  receiverId: string,
-  amount: number
-) {
-  try {
-    await conn.query(
-      "INSERT INTO transactions (sender_id, receiver_id, amount) VALUES (?, ?, ?)",
-      [senderId, receiverId, amount]
-    );
-  } catch (error) {
-    logger.error(error);
-    throw error;
+async function save(conn: PoolClient, p: TransactionPayload): Promise<boolean> {
+  const query =
+    "INSERT INTO transactions (email, service_code, invoice_number) VALUES ($1, $2, $3)";
+  const args = [p.email, p.service_code, p.invoice_number];
+  const result = await conn.query<TransactionResult>(query, args);
+  if (!result.rowCount) {
+    return false;
   }
+  return true;
 }
 
-export default { logTransaction };
+async function list(email: string): Promise<History[]> {
+  const query = `
+                SELECT
+                  i.number as invoice_number,
+                  i.transaction_type,
+                  i.description,
+                  i.total_amount,
+                  i.created_on
+                FROM transactions t
+                JOIN invoices i ON i.number = t.invoice_number
+                WHERE t.email = $1
+                ORDER BY i.created_on DESC
+                `;
+  const result = await pool.query<History>(query, [email]);
+  return result.rows;
+}
+
+export default { save, list };

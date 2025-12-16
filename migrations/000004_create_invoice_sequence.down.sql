@@ -1,0 +1,1 @@
+DROP SEQUENCE invoice_seq;

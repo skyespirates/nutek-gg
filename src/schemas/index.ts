@@ -26,6 +26,10 @@ export const topupSchema = z.object({
   amount: z.number().min(1),
 });
 
+export const paymentSchema = z.object({
+  service_code: z.string(),
+});
+
 export const newAccountSchema = z.object({
   name: z.string(),
 });
