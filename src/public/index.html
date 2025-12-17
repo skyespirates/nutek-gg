@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nutek-GG API Documentation</title>
+
+    <style>
+      :root {
+        --bg: #0f172a;
+        --card: #111827;
+        --text: #e5e7eb;
+        --muted: #9ca3af;
+        --border: #1f2933;
+
+        --get: #2563eb;
+        --post: #16a34a;
+        --put: #f59e0b;
+      }
+
+      * {
+        box-sizing: border-box;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+          sans-serif;
+      }
+
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.6;
+      }
+
+      header {
+        padding: 48px 24px;
+        border-bottom: 1px solid var(--border);
+        background: linear-gradient(180deg, #020617, #0f172a);
+      }
+
+      header h1 {
+        font-size: 2.2rem;
+        margin: 0;
+      }
+
+      header p {
+        color: var(--muted);
+        max-width: 700px;
+      }
+
+      .container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 32px 24px;
+      }
+
+      .base-url {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 16px;
+        margin-bottom: 32px;
+      }
+
+      .base-url code {
+        color: #22d3ee;
+        font-size: 0.95rem;
+      }
+
+      section {
+        margin-bottom: 40px;
+      }
+
+      section h2 {
+        font-size: 1.3rem;
+        margin-bottom: 16px;
+        border-left: 4px solid #22d3ee;
+        padding-left: 12px;
+      }
+
+      .endpoint {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 14px 16px;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .method {
+        font-weight: 700;
+        font-size: 0.75rem;
+        padding: 4px 10px;
+        border-radius: 999px;
+        color: white;
+        min-width: 56px;
+        text-align: center;
+      }
+
+      .get {
+        background: var(--get);
+      }
+      .post {
+        background: var(--post);
+      }
+      .put {
+        background: var(--put);
+      }
+
+      .path {
+        font-family: monospace;
+        font-size: 0.95rem;
+      }
+
+      footer {
+        border-top: 1px solid var(--border);
+        padding: 24px;
+        text-align: center;
+        color: var(--muted);
+        font-size: 0.85rem;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="container">
+        <h1>Nutek-GG API</h1>
+        <p>
+          Simple API documentation for SIMS PPOB Take Home Test. This page
+          serves as the public homepage for the Nutek-GG backend API.
+        </p>
+      </div>
+    </header>
+
+    <main class="container">
+      <div class="base-url">
+        <strong>Base URL</strong><br />
+        <!-- <code>https://your-api-domain.up.railway.app</code> -->
+      </div>
+
+      <section>
+        <h2>1. Membership</h2>
+
+        <div class="endpoint">
+          <span class="method post">POST</span>
+          <span class="path">/registration</span>
+        </div>
+
+        <div class="endpoint">
+          <span class="method post">POST</span>
+          <span class="path">/login</span>
+        </div>
+
+        <div class="endpoint">
+          <span class="method get">GET</span>
+          <span class="path">/profile</span>
+        </div>
+
+        <div class="endpoint">
+          <span class="method put">PUT</span>
+          <span class="path">/profile/update</span>
+        </div>
+
+        <div class="endpoint">
+          <span class="method put">PUT</span>
+          <span class="path">/profile/image</span>
+        </div>
+      </section>
+
+      <section>
+        <h2>2. Information</h2>
+
+        <div class="endpoint">
+          <span class="method get">GET</span>
+          <span class="path">/banner</span>
+        </div>
+
+        <div class="endpoint">
+          <span class="method get">GET</span>
+          <span class="path">/services</span>
+        </div>
+      </section>
+
+      <section>
+        <h2>3. Transaction</h2>
+
+        <div class="endpoint">
+          <span class="method get">GET</span>
+          <span class="path">/balance</span>
+        </div>
+
+        <div class="endpoint">
+          <span class="method post">POST</span>
+          <span class="path">/topup</span>
+        </div>
+
+        <div class="endpoint">
+          <span class="method post">POST</span>
+          <span class="path">/transaction</span>
+        </div>
+
+        <div class="endpoint">
+          <span class="method get">GET</span>
+          <span class="path">/transaction/history</span>
+        </div>
+      </section>
+    </main>
+
+    <footer>© 2025 Nutek-GG API · Powered by Express & PostgreSQL</footer>
+  </body>
+</html>

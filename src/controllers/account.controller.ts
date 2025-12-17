@@ -63,8 +63,8 @@ async function updateProfile(req: Request, res: Response) {
 
 async function uploadProfileImage(req: Request, res: Response) {
   const { email } = req.user as TokenPayload;
-  const baseUrl = "http://localhost:3000/";
-  const imageUrl = baseUrl + req.file?.originalname;
+  const baseUrl = process.env.API_BASE_URL!;
+  const imageUrl = `${baseUrl}/${req.file?.originalname}`;
   const profile = await accountService.updateProfileImage(imageUrl, email);
 
   if (!profile) {

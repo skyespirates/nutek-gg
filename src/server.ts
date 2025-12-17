@@ -13,8 +13,6 @@ import multer from "multer";
 import asyncHandler from "express-async-handler";
 
 // routes
-import authRoutes from "./routes/auth.route";
-import accountRoutes from "./routes/account.route";
 import { TokenPayload } from "./types";
 import accountController from "./controllers/account.controller";
 import {
@@ -31,6 +29,7 @@ import transactionController from "./controllers/transaction.controller";
 import authController from "./controllers/auth.controller";
 import { HttpError } from "./utils/http-error";
 
+const publicDir = path.join(__dirname, "public");
 const uploadDir = path.join(__dirname, "uploads");
 
 const allowedMimeTypes = ["image/jpeg", "image/png"];
@@ -63,6 +62,7 @@ const port = process.env.PORT || 8080;
 app.use(logging);
 app.use(express.json());
 
+app.use(express.static(publicDir));
 app.use(express.static(uploadDir));
 
 app.post(
@@ -124,8 +124,8 @@ app.get(
   asyncHandler(transactionController.list)
 );
 
-app.get("/", (req: Request, res: Response) => {
-  res.send("Hello, World!");
+app.all("*", (req, res) => {
+  res.status(404).sendFile(path.join(publicDir, "404.html"));
 });
 
 app.use(errorHandler);
