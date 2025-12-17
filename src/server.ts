@@ -59,6 +59,8 @@ const upload = multer({
 const app = express();
 const port = process.env.PORT || 8080;
 
+app.set("trust proxy", true);
+
 app.use(logging);
 app.use(express.json());
 
@@ -131,7 +133,7 @@ app.all("*", (req, res) => {
 app.use(errorHandler);
 
 app.listen(port, () => {
-  logger.info(`Server is running on http://localhost:${port}`);
+  logger.info(`Server is running on ${port}`);
 });
 
 declare global {

@@ -1,2 +1,5 @@
-# NOTES
-The purpose of this app is to setup basic express app using typescript
+# nutek-gg
+
+## Database Design
+
+![db](./assets//nutech.jpg)
