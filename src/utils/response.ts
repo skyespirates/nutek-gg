@@ -12,7 +12,7 @@ interface SuccessResponse<T> extends BaseResponse {
 
 interface FailedResponse extends BaseResponse {
   status: 400 | 401 | 403 | 404 | 409 | 422 | 500;
-  data?: never;
+  data?: any;
 }
 
 export const success = <T>(
@@ -38,6 +38,7 @@ export const failure = (
   const body: FailedResponse = {
     status,
     message,
+    data: null,
   };
 
   return res.status(status).json(body);

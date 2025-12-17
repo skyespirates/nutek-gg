@@ -15,6 +15,7 @@ import serviceService from "../services/service.service";
 import pool from "../infra/db";
 import transactionService from "../services/transaction.service";
 import invoiceService from "../services/invoice.service";
+import { HttpError } from "../utils/http-error";
 
 async function createAccount(req: Request, res: Response) {
   const { email, first_name, last_name, password } = req.body;
@@ -24,92 +25,69 @@ async function createAccount(req: Request, res: Response) {
     last_name,
     password,
   };
-  try {
-    const created = await accountService.createAccount(account);
-    if (!created) {
-      failure(res, "failed to register");
-    }
-    success(res, 201, "Registrasi berhasil silahkan login", null);
-  } catch (error) {
-    logger.error(error);
-    failure(res, "Parameter email tidak sesuai format", 400);
+  const created = await accountService.createAccount(account);
+  if (!created) {
+    throw new HttpError(400, "Parameter email tidak sesuai format");
   }
+  success(res, 201, "Registrasi berhasil silahkan login", null);
 }
 
 async function getProfile(req: Request, res: Response) {
   const { email } = req.user as TokenPayload;
   logger.info(email);
-  try {
-    const account = await accountService.getAccountByEmail(email);
-    if (!account) {
-      failure(res, "Token tidak tidak valid atau kadaluwarsa", 401);
-    }
-    const data: Profile = {
-      email: account.email,
-      first_name: account.first_name,
-      last_name: account.last_name,
-      profile_image: account.profile_image || "",
-    };
+  const account = await accountService.getAccountByEmail(email);
+  const data: Profile = {
+    email: account.email,
+    first_name: account.first_name,
+    last_name: account.last_name,
+    profile_image: account.profile_image || "",
+  };
 
-    success(res, 200, "Sukses", data);
-  } catch (error) {
-    logger.error(error);
-    failure(res, "Token tidak tidak valid atau kadaluwarsa", 401);
-  }
+  success(res, 200, "Sukses", data);
 }
 
 async function updateProfile(req: Request, res: Response) {
   const { email } = req.user as TokenPayload;
   const { first_name, last_name } = req.body;
-  try {
-    const profile = await accountService.updateProfile(
-      first_name,
-      last_name,
-      email
-    );
+  const profile = await accountService.updateProfile(
+    first_name,
+    last_name,
+    email
+  );
 
-    if (!profile.profile_image) {
-      profile.profile_image = "";
-    }
-    success<Profile>(res, 200, "Update Pofile berhasil", profile);
-  } catch (error) {
-    logger.error(error);
-    failure(res, "failed to update profile", 500);
+  if (!profile.profile_image) {
+    profile.profile_image = "";
   }
+  success<Profile>(res, 200, "Update Pofile berhasil", profile);
 }
 
 async function uploadProfileImage(req: Request, res: Response) {
   const { email } = req.user as TokenPayload;
   const baseUrl = "http://localhost:3000/";
-  try {
-    const imageUrl = baseUrl + req.file?.originalname;
-    const profile = await accountService.updateProfileImage(imageUrl, email);
+  const imageUrl = baseUrl + req.file?.originalname;
+  const profile = await accountService.updateProfileImage(imageUrl, email);
 
-    if (!profile) {
-      failure(res, "failed to update profile image", 400);
-    }
-    success<Profile>(res, 200, "Update Profile Image berhasil", profile!);
-  } catch (error) {
-    logger.error(error);
-    failure(res, "failed to upload file", 500);
+  if (!profile) {
+    throw new HttpError(400, "failed to upload profile image");
   }
+  success<Profile>(res, 200, "Update Profile Image berhasil", profile!);
 }
 
 async function getBalance(req: Request, res: Response) {
   const { email } = req.user as TokenPayload;
   const balance = await accountService.getBalance(email);
-  success<Balance>(res, 200, "get balance", balance);
+  success<Balance>(res, 200, "Get Balance Berhasil", balance);
 }
 
 async function topup(req: Request, res: Response) {
   const { email } = req.user as TokenPayload;
-  const { amount } = req.body;
+  const { top_up_amount } = req.body;
   const conn = await pool.connect();
   try {
     await conn.query("BEGIN");
     // 1. update balance
-    const succeed = await accountService.topup(conn, email, amount);
-    if (!succeed) {
+    const balance = await accountService.topup(conn, email, top_up_amount);
+    if (!balance) {
       failure(res, "failed on update balance", 400);
     }
 
@@ -117,7 +95,7 @@ async function topup(req: Request, res: Response) {
     const invData: InvoicePayload = {
       transaction_type: "TOPUP",
       description: "Topup balance",
-      total_amount: amount,
+      total_amount: top_up_amount,
     };
     const inv = await invoiceService.create(conn, invData);
     if (!inv) {
@@ -136,7 +114,7 @@ async function topup(req: Request, res: Response) {
     }
 
     await conn.query("COMMIT");
-    success(res, 200, "topup successfully", null);
+    success<Balance>(res, 200, "Top Up Balance berhasil", balance);
   } catch (error) {
     await conn.query("ROLLBACK");
     logger.error(error);

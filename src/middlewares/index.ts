@@ -1,13 +1,12 @@
 import { Request, Response, NextFunction, ErrorRequestHandler } from "express";
 import { z, ZodError } from "zod";
 
-import { StatusCodes } from "http-status-codes";
 import { failure } from "../utils/response";
 import jwt from "jsonwebtoken";
-import logService from "../services/log.service";
 import logger from "../utils/logger";
 import multer from "multer";
 import { TokenPayload } from "../types";
+import { HttpError } from "../utils/http-error";
 
 export function validateData(schema: z.ZodObject<any, any>) {
   return (req: Request, res: Response, next: NextFunction) => {
@@ -19,55 +18,35 @@ export function validateData(schema: z.ZodObject<any, any>) {
         const errorMessages = error.errors.map((issue: any) => ({
           message: `${issue.path.join(".")} is ${issue.message}`,
         }));
-        res
-          .status(StatusCodes.BAD_REQUEST)
-          .json({ error: "Invalid data", details: errorMessages });
-        return;
+        throw new HttpError(400, errorMessages[0].message);
       } else {
-        res
-          .status(StatusCodes.INTERNAL_SERVER_ERROR)
-          .json({ error: "Internal Server Error" });
-        return;
+        throw new HttpError(500, "internal server error");
       }
     }
   };
 }
 
-export function authenticateJWT(
-  req: Request,
-  res: Response,
-  next: NextFunction
-) {
-  const secret_key = process.env.JWT_SECRET;
-  if (!secret_key) {
-    throw new Error("JWT_SECRET is not set");
-  }
-  const token = req.header("Authorization")?.split(" ")[1];
-  if (token) {
-    jwt.verify(token, secret_key, (err, payload) => {
-      if (err) {
-        failure(res, "Token tidak tidak valid atau kadaluwarsa", 401);
-        return;
-      }
-      req.user = payload as TokenPayload;
-      next();
-    });
-  } else {
-    failure(res, "Token tidak tidak valid atau kadaluwarsa", 401);
-  }
-}
+export function authenticate(req: Request, res: Response, next: NextFunction) {
+  const authHeader = req.headers.authorization;
 
-export async function storeLogRequest(
-  req: Request,
-  res: Response,
-  next: NextFunction
-) {
-  try {
-    logService.storeLog(req.path);
-  } catch (error) {
-    failure(res, "failed to save log");
+  if (!authHeader?.startsWith("Bearer ")) {
+    // throw new HttpError(401, "Authentication token missing");
+    throw new HttpError(401, "Token tidak valid atau kadaluwarsa");
   }
-  next();
+
+  const token = authHeader.split(" ")[1];
+
+  try {
+    const payload = jwt.verify(token, process.env.JWT_SECRET!);
+    req.user = payload as TokenPayload;
+    next();
+  } catch (err: any) {
+    if (err.name === "TokenExpiredError") {
+      throw new HttpError(401, "Token tidak valid atau kadaluwarsa");
+    }
+
+    throw new HttpError(401, "Token tidak valid atau kadaluwarsa");
+  }
 }
 
 export function logging(req: Request, res: Response, next: NextFunction) {
@@ -84,13 +63,16 @@ export const errorHandler: ErrorRequestHandler = (
   res: Response,
   next: NextFunction
 ) => {
+  const { statusCode, message } = err;
   if (err instanceof multer.MulterError) {
     failure(res, "Error multer cokkkk🥶");
   }
 
-  if (err) {
-    failure(res, "Format Image tidak sesuai");
+  if (err instanceof HttpError) {
+    failure(res, message, statusCode);
   }
+
+  failure(res, "internal server error", 500);
 
   next();
 };

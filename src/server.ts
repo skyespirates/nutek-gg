@@ -1,13 +1,8 @@
 import "dotenv/config";
-import express, {
-  NextFunction,
-  Request,
-  Response,
-  ErrorRequestHandler,
-} from "express";
+import express, { Request, Response } from "express";
 import logger from "./utils/logger";
 import {
-  authenticateJWT,
+  authenticate,
   errorHandler,
   logging,
   validateData,
@@ -18,20 +13,23 @@ import multer from "multer";
 import asyncHandler from "express-async-handler";
 
 // routes
-import authRoutes from "./routes/auth";
-import runnerRoutes from "./routes/runner.route";
-import requestRoutes from "./routes/request.route";
-import protectedRoutes from "./routes/protected.route";
+import authRoutes from "./routes/auth.route";
 import accountRoutes from "./routes/account.route";
-import transferRoutes from "./routes/transfer.route";
-import { failure } from "./utils/response";
 import { TokenPayload } from "./types";
 import accountController from "./controllers/account.controller";
-import { paymentSchema, topupSchema, updateProfileSchema } from "./schemas";
+import {
+  RegistrationSchema,
+  paymentSchema,
+  topupSchema,
+  updateProfileSchema,
+  userLoginSchema,
+} from "./schemas";
 import path from "path";
 import serviceController from "./controllers/service.controller";
 import bannerController from "./controllers/banner.controller";
 import transactionController from "./controllers/transaction.controller";
+import authController from "./controllers/auth.controller";
+import { HttpError } from "./utils/http-error";
 
 const uploadDir = path.join(__dirname, "uploads");
 
@@ -54,7 +52,7 @@ const upload = multer({
     if (allowedMimeTypes.includes(mime) && allowedExtensions.includes(ext)) {
       cb(null, true);
     } else {
-      cb(new Error("Only JPEG and PNG images are allowed"));
+      cb(new HttpError(400, "Format image tidak sesuai"));
     }
   },
 });
@@ -67,67 +65,63 @@ app.use(express.json());
 
 app.use(express.static(uploadDir));
 
-// #1 autentikasi dengan 2 metode login, basic dan otp
-app.use("/auth", authRoutes);
+app.post(
+  "/login",
+  validateData(userLoginSchema),
+  asyncHandler(authController.login)
+);
 
-// #2 running number
-app.use("/runner", runnerRoutes);
+app.post(
+  "/registration",
+  validateData(RegistrationSchema),
+  asyncHandler(accountController.createAccount)
+);
 
-app.use("/registration", accountRoutes);
-
-app.get("/profile", authenticateJWT, accountController.getProfile);
+app.get("/profile", authenticate, asyncHandler(accountController.getProfile));
 
 app.put(
   "/profile/update",
-  authenticateJWT,
+  authenticate,
   validateData(updateProfileSchema),
-  accountController.updateProfile
+  asyncHandler(accountController.updateProfile)
 );
 
 app.put(
   "/profile/image",
-  authenticateJWT,
+  authenticate,
   upload.single("file"),
-  accountController.uploadProfileImage
+  asyncHandler(accountController.uploadProfileImage)
 );
 
-app.get("/banners", authenticateJWT, asyncHandler(bannerController.list));
+app.get("/banners", asyncHandler(bannerController.list));
 
-app.get("/services", authenticateJWT, asyncHandler(serviceController.list));
-
-app.get("/sync", (req, res) => {
-  throw new Error("error sync");
-});
-
-app.get("/async", async (req, res) => {
-  throw new Error("error async");
-});
+app.get("/services", authenticate, asyncHandler(serviceController.list));
 
 app.get(
   "/get-balance",
-  authenticateJWT,
+  authenticate,
   asyncHandler(accountController.getBalance)
 );
 
 app.post(
   "/topup",
-  authenticateJWT,
+  authenticate,
   validateData(topupSchema),
-  accountController.topup
+  asyncHandler(accountController.topup)
 );
 
 app.post(
   "/transaction",
-  authenticateJWT,
+  authenticate,
   validateData(paymentSchema),
-  accountController.payment
+  asyncHandler(accountController.payment)
 );
 
 app.get(
   "/transaction/history",
-  authenticateJWT,
+  authenticate,
   validateData(paymentSchema),
-  transactionController.list
+  asyncHandler(transactionController.list)
 );
 
 app.get("/", (req: Request, res: Response) => {

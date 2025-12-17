@@ -67,6 +67,13 @@ export interface Service {
   tariff: number;
 }
 
+export interface SerivceResp {
+  service_code: string;
+  service_name: string;
+  service_icon?: string;
+  service_tariff: number;
+}
+
 export interface Banner {
   name: string;
   image: string;
@@ -76,7 +83,7 @@ export interface Banner {
 export interface BannerResp {
   banner_name: string;
   banner_image: string;
-  banner_description: string;
+  description: string;
 }
 
 export interface Payment {

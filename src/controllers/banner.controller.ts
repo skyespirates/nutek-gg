@@ -10,7 +10,7 @@ async function list(req: Request, res: Response) {
     const tmp: BannerResp = {
       banner_name: b.name,
       banner_image: b.image,
-      banner_description: b.description,
+      description: b.description,
     };
     resp.push(tmp);
   }
