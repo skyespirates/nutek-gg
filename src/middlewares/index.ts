@@ -72,6 +72,7 @@ export const errorHandler: ErrorRequestHandler = (
     failure(res, message, statusCode);
   }
 
+  logger.error(err.message);
   failure(res, "internal server error", 500);
 
   next();
