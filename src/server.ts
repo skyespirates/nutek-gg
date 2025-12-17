@@ -29,7 +29,7 @@ import transactionController from "./controllers/transaction.controller";
 import authController from "./controllers/auth.controller";
 import { HttpError } from "./utils/http-error";
 
-const publicDir = path.join(__dirname, "public");
+const publicDir = path.join(__dirname, "../public");
 const uploadDir = path.join(__dirname, "uploads");
 
 const allowedMimeTypes = ["image/jpeg", "image/png"];
