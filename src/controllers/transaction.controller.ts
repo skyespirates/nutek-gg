@@ -15,7 +15,7 @@ async function list(req: Request, res: Response) {
     success<History[]>(res, 200, "Get History Berhasil", trxHistory);
   } catch (error) {
     if (error instanceof z.ZodError) {
-      const errorMessages = error.errors.map((issue: any) => ({
+      const errorMessages = error.issues.map((issue: any) => ({
         message: `${issue.path.join(".")} is ${issue.message}`,
       }));
       failure(res, errorMessages[0].message, 400);
