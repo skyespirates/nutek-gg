@@ -1,14 +1,25 @@
 import { z } from "zod";
+import { extendZodWithOpenApi } from "@asteasolutions/zod-to-openapi";
+
+extendZodWithOpenApi(z);
+
+export function ApiResponse<T extends z.ZodTypeAny>(dataSchema?: T) {
+  return z.object({
+    status: z.number().openapi({ example: 200 }),
+    message: z.string().openapi({ example: "Sukses" }),
+    data: dataSchema || z.null().openapi({ example: null }),
+  });
+}
 
 export const RegistrationSchema = z.object({
-  email: z.string().email(),
-  first_name: z.string(),
-  last_name: z.string(),
-  password: z.string().min(8),
+  email: z.email().openapi({ example: "sensei@email.com" }),
+  first_name: z.string().openapi({ example: "dragon" }),
+  last_name: z.string().openapi({ example: "warrior" }),
+  password: z.string().min(8).openapi({ example: "slebew123" }),
 });
 
 export const userLoginSchema = z.object({
-  email: z.string().email(),
+  email: z.email(),
   password: z.string().min(8),
 });
 
@@ -38,6 +49,14 @@ export const updateProfileSchema = z.object({
 });
 
 export const HistoryQuerySchema = z.object({
-  offset: z.string().pipe(z.coerce.number().int().min(0)),
-  limit: z.string().pipe(z.coerce.number().int().min(1)),
+  offset: z.coerce.number().int().min(0),
+  limit: z.coerce.number().int().min(1),
+});
+
+export const UploadFileSchema = z.object({
+  file: z.instanceof(Buffer).openapi({
+    type: "string",
+    format: "binary",
+    description: "File to upload",
+  }),
 });
