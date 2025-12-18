@@ -1,5 +1,5 @@
 import "dotenv/config";
-import express, { Request, Response } from "express";
+import express from "express";
 import logger from "./utils/logger";
 import {
   authenticate,
@@ -9,7 +9,8 @@ import {
 } from "./middlewares";
 import { JwtPayload } from "jsonwebtoken";
 import multer from "multer";
-
+import swaggerUi from "swagger-ui-express";
+import { openApiDoc } from "./docs/openapi-doc";
 import asyncHandler from "express-async-handler";
 
 // routes
@@ -67,6 +68,8 @@ app.use(express.json());
 app.use(express.static(publicDir));
 app.use(express.static(uploadDir));
 
+app.use("/docs", swaggerUi.serve, swaggerUi.setup(openApiDoc));
+
 app.post(
   "/login",
   validateData(userLoginSchema),
@@ -95,7 +98,7 @@ app.put(
   asyncHandler(accountController.uploadProfileImage)
 );
 
-app.get("/banners", asyncHandler(bannerController.list));
+app.get("/banner", asyncHandler(bannerController.list));
 
 app.get("/services", authenticate, asyncHandler(serviceController.list));
 
