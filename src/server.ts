@@ -13,7 +13,6 @@ import swaggerUi from "swagger-ui-express";
 import { openApiDoc } from "./docs/openapi-doc";
 import asyncHandler from "express-async-handler";
 
-// routes
 import { TokenPayload } from "./types";
 import accountController from "./controllers/account.controller";
 import { paymentSchema, topupSchema, updateProfileSchema } from "./schemas";
