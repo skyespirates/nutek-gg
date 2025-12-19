@@ -594,6 +594,23 @@ registry.registerPath({
   path: "/topup",
   tags: ["3. Module Transaction"],
   security: [{ bearerAuth: [] }],
+  request: {
+    body: {
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            properties: {
+              top_up_amount: {
+                type: "number",
+                example: 150000,
+              },
+            },
+          },
+        },
+      },
+    },
+  },
   responses: {
     200: {
       description: "",

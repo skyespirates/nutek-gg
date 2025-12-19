@@ -102,11 +102,7 @@ app.get("/banner", asyncHandler(bannerController.list));
 
 app.get("/services", authenticate, asyncHandler(serviceController.list));
 
-app.get(
-  "/get-balance",
-  authenticate,
-  asyncHandler(accountController.getBalance)
-);
+app.get("/balance", authenticate, asyncHandler(accountController.getBalance));
 
 app.post(
   "/topup",
@@ -125,7 +121,6 @@ app.post(
 app.get(
   "/transaction/history",
   authenticate,
-  validateData(paymentSchema),
   asyncHandler(transactionController.list)
 );
 

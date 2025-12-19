@@ -19,8 +19,8 @@ export const RegistrationSchema = z.object({
 });
 
 export const userLoginSchema = z.object({
-  email: z.email(),
-  password: z.string().min(8),
+  email: z.email().openapi({ example: "sykes@email.com" }),
+  password: z.string().min(8).openapi({ example: "password123" }),
 });
 
 export const itemSchema = z.object({
