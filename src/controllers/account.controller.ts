@@ -16,6 +16,7 @@ import pool from "../infra/db";
 import transactionService from "../services/transaction.service";
 import invoiceService from "../services/invoice.service";
 import { HttpError } from "../utils/http-error";
+import { RegisterResponse } from "../schemas/register.schema";
 
 async function createAccount(req: Request, res: Response) {
   const { email, first_name, last_name, password } = req.body;
@@ -29,7 +30,12 @@ async function createAccount(req: Request, res: Response) {
   if (!created) {
     throw new HttpError(400, "Parameter email tidak sesuai format");
   }
-  success(res, 201, "Registrasi berhasil silahkan login", null);
+  success<RegisterResponse>(
+    res,
+    201,
+    "Registrasi berhasil silahkan login",
+    null
+  );
 }
 
 async function getProfile(req: Request, res: Response) {

@@ -11,18 +11,6 @@ export function ApiResponse<T extends z.ZodTypeAny>(dataSchema?: T) {
   });
 }
 
-export const RegistrationSchema = z.object({
-  email: z.email().openapi({ example: "sensei@email.com" }),
-  first_name: z.string().openapi({ example: "dragon" }),
-  last_name: z.string().openapi({ example: "warrior" }),
-  password: z.string().min(8).openapi({ example: "slebew123" }),
-});
-
-export const userLoginSchema = z.object({
-  email: z.email().openapi({ example: "sykes@email.com" }),
-  password: z.string().min(8).openapi({ example: "password123" }),
-});
-
 export const itemSchema = z.object({
   name: z.string(),
 });

@@ -16,19 +16,15 @@ import asyncHandler from "express-async-handler";
 // routes
 import { TokenPayload } from "./types";
 import accountController from "./controllers/account.controller";
-import {
-  RegistrationSchema,
-  paymentSchema,
-  topupSchema,
-  updateProfileSchema,
-  userLoginSchema,
-} from "./schemas";
+import { paymentSchema, topupSchema, updateProfileSchema } from "./schemas";
 import path from "path";
 import serviceController from "./controllers/service.controller";
 import bannerController from "./controllers/banner.controller";
 import transactionController from "./controllers/transaction.controller";
 import authController from "./controllers/auth.controller";
 import { HttpError } from "./utils/http-error";
+import { LoginPayloadSchema } from "./schemas/login.schema";
+import { RegistrationPayloadSchema } from "./schemas/register.schema";
 
 const publicDir = path.join(__dirname, "../public");
 const uploadDir = path.join(__dirname, "uploads");
@@ -72,13 +68,13 @@ app.use("/docs", swaggerUi.serve, swaggerUi.setup(openApiDoc));
 
 app.post(
   "/login",
-  validateData(userLoginSchema),
+  validateData(LoginPayloadSchema),
   asyncHandler(authController.login)
 );
 
 app.post(
   "/registration",
-  validateData(RegistrationSchema),
+  validateData(RegistrationPayloadSchema),
   asyncHandler(accountController.createAccount)
 );
 

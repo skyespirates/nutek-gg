@@ -2,13 +2,19 @@ import { OpenAPIRegistry } from "@asteasolutions/zod-to-openapi";
 
 export const registry = new OpenAPIRegistry();
 
-import {
-  ApiResponse,
-  RegistrationSchema,
-  UploadFileSchema,
-  userLoginSchema,
-} from "../schemas";
+import { UploadFileSchema } from "../schemas";
 import z from "zod";
+import {
+  InvalidFormatSchema,
+  LoginPayloadSchema,
+  LoginResponseSchema,
+  WrongCredentialSchema,
+} from "../schemas/login.schema";
+import {
+  InvalidEmailSchema,
+  RegisterResponseSchema,
+  RegistrationPayloadSchema,
+} from "../schemas/register.schema";
 
 registry.registerComponent("securitySchemes", "bearerAuth", {
   type: "http",
@@ -24,7 +30,7 @@ registry.registerPath({
     body: {
       content: {
         "application/json": {
-          schema: RegistrationSchema,
+          schema: RegistrationPayloadSchema,
         },
       },
     },
@@ -34,7 +40,7 @@ registry.registerPath({
       description: "",
       content: {
         "application/json": {
-          schema: ApiResponse(),
+          schema: RegisterResponseSchema,
         },
       },
     },
@@ -42,23 +48,7 @@ registry.registerPath({
       description: "",
       content: {
         "application/json": {
-          schema: {
-            type: "object",
-            properties: {
-              status: {
-                type: "number",
-                example: 401,
-              },
-              message: {
-                type: "string",
-                example: "email is invalid",
-              },
-              data: {
-                type: "null",
-                example: null,
-              },
-            },
-          },
+          schema: InvalidEmailSchema,
         },
       },
     },
@@ -73,7 +63,7 @@ registry.registerPath({
     body: {
       content: {
         "application/json": {
-          schema: userLoginSchema,
+          schema: LoginPayloadSchema,
         },
       },
     },
@@ -83,29 +73,7 @@ registry.registerPath({
       description: "Login user",
       content: {
         "application/json": {
-          schema: {
-            type: "object",
-            properties: {
-              status: {
-                type: "number",
-                example: 200,
-              },
-              message: {
-                type: "string",
-                example: "Login Sukses",
-              },
-              data: {
-                type: "object",
-                properties: {
-                  token: {
-                    type: "string",
-                    example:
-                      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjoiNTRVdXRjYTdCS0ZPX0ZUZGZ1bXlJem9zSTRKa1VxUGZVZ0ROSTUwelRTQlo2aHoyY0hKZ1VMb1loM09HUUd0ekQxV3dTX194aHBNZTE2SGFscVRzcEhjS21UclJ3S2FYYmZob3AzdzFFUHJ2NFdBQmk1c0RpdV9DSnZTSWt2MDFTbEU0QU5pbVB0bUx5azZoUzlOalVQNEZaVVpfRVBtcEk4Y3pNc3ZWa2JFPSIsImlhdCI6MTYyNjkyODk3MSwiZXhwIjoyNTU2MTE4Nzk4fQ.9C9NvhZYKivhGWnrjo4Wr1Rv-wur1wCm0jqfK9XDD8U",
-                  },
-                },
-              },
-            },
-          },
+          schema: LoginResponseSchema,
         },
       },
     },
@@ -113,23 +81,7 @@ registry.registerPath({
       description: "",
       content: {
         "application/json": {
-          schema: {
-            type: "object",
-            properties: {
-              status: {
-                type: "number",
-                example: 102,
-              },
-              message: {
-                type: "string",
-                example: "Paramter email tidak sesuai format",
-              },
-              data: {
-                type: "null",
-                example: null,
-              },
-            },
-          },
+          schema: InvalidFormatSchema,
         },
       },
     },
@@ -137,23 +89,7 @@ registry.registerPath({
       description: "",
       content: {
         "application/json": {
-          schema: {
-            type: "object",
-            properties: {
-              status: {
-                type: "number",
-                example: 103,
-              },
-              message: {
-                type: "string",
-                example: "Username atau password salah",
-              },
-              data: {
-                type: "null",
-                example: null,
-              },
-            },
-          },
+          schema: WrongCredentialSchema,
         },
       },
     },
