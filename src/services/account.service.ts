@@ -21,16 +21,16 @@ async function createAccount(account: NewAccount): Promise<boolean> {
     if (error instanceof DatabaseError) {
       switch (error.code) {
         case "23505":
-          throw new HttpError(409, "Email already registered");
+          throw new HttpError(409, 102, "Email already registered");
 
         case "23502":
-          throw new HttpError(400, "Missing required fields");
+          throw new HttpError(400, 102, "Missing required fields");
 
         case "22P02":
-          throw new HttpError(400, "Invalid input format");
+          throw new HttpError(400, 102, "Invalid input format");
 
         default:
-          throw new HttpError(500, "Database error");
+          throw new HttpError(500, 103, "Database error");
       }
     }
 
@@ -68,7 +68,7 @@ async function updateProfileImage(
   );
 
   if (!result.rowCount) {
-    throw new HttpError(400, "failed to upload profile image");
+    throw new HttpError(400, 103, "failed to upload profile image");
   }
 
   return result.rows[0];

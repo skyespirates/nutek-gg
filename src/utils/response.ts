@@ -1,45 +1,23 @@
 import { Response } from "express";
 
-interface BaseResponse {
+interface IResponse<T> {
   status: number;
   message: string;
+  data: T | null;
 }
 
-interface SuccessResponse<T> extends BaseResponse {
-  status: 200 | 201 | 204;
-  data: T;
-}
-
-interface FailedResponse extends BaseResponse {
-  status: 400 | 401 | 403 | 404 | 409 | 422 | 500;
-  data?: any;
-}
-
-export const success = <T>(
+export function response<T>(
   res: Response,
-  status: 200 | 201 = 200,
+  code: 200 | 201 | 400 | 401 | 500 = 200,
+  status: number,
   message = "OK",
-  data: T
-) => {
-  const body: SuccessResponse<T> = {
+  data: T | null
+) {
+  const body: IResponse<T> = {
     status,
     message,
     data,
   };
 
-  return res.status(status).json(body);
-};
-
-export const failure = (
-  res: Response,
-  message: string,
-  status: FailedResponse["status"] = 400
-) => {
-  const body: FailedResponse = {
-    status,
-    message,
-    data: null,
-  };
-
-  return res.status(status).json(body);
-};
+  return res.status(code).json(body);
+}

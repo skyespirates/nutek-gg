@@ -15,6 +15,7 @@ import {
   RegisterResponseSchema,
   RegistrationPayloadSchema,
 } from "../schemas/register.schema";
+import { TransactionHistoryResponseSchema } from "../schemas/transaction.schema";
 
 registry.registerComponent("securitySchemes", "bearerAuth", {
   type: "http",
@@ -132,7 +133,7 @@ registry.registerPath({
               },
               message: {
                 type: "string",
-                example: "Token tidak tidak valid atau kadaluwarsa",
+                example: "Token tidak valid atau kadaluwarsa",
               },
               data: {
                 type: "null",
@@ -653,7 +654,7 @@ registry.registerPath({
             type: "object",
             properties: {
               status: { type: "number", example: 0 },
-              message: { type: "string", example: "Top Up Balance Berhasil" },
+              message: { type: "string", example: "Transaksi Berhasil" },
               data: {
                 type: "object",
                 properties: {
@@ -744,60 +745,7 @@ registry.registerPath({
       description: "",
       content: {
         "application/json": {
-          schema: {
-            type: "object",
-            properties: {
-              status: {
-                type: "number",
-                example: 0,
-              },
-              message: {
-                type: "string",
-                example: "Sukses",
-              },
-              data: {
-                type: "object",
-                properties: {
-                  offset: {
-                    type: "number",
-                    example: 0,
-                  },
-                  limit: {
-                    type: "number",
-                    example: 3,
-                  },
-                  records: {
-                    type: "array",
-                    items: {
-                      type: "object",
-                      properties: {
-                        invoice_number: {
-                          type: "string",
-                          example: "INV17082023-001",
-                        },
-                        transaction_type: {
-                          type: "string",
-                          example: "TOPUP",
-                        },
-                        description: {
-                          type: "string",
-                          example: "Top up balance",
-                        },
-                        amount: {
-                          type: "number",
-                          example: 10000,
-                        },
-                        created_on: {
-                          type: "string",
-                          example: "2023-08-17T10:10:10.000Z",
-                        },
-                      },
-                    },
-                  },
-                },
-              },
-            },
-          },
+          schema: TransactionHistoryResponseSchema,
         },
       },
     },

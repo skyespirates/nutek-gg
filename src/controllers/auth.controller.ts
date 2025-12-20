@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { success } from "../utils/response";
+import { response } from "../utils/response";
 import bcrypt from "bcrypt";
 import accountService from "../services/account.service";
 import jwt from "../utils/jwt";
@@ -12,22 +12,22 @@ const login = async (req: Request, res: Response) => {
 
   const account = await accountService.getAccountByEmail(email);
   if (!account) {
-    throw new HttpError(401, "Email atau password salah");
+    throw new HttpError(401, 103, "Email atau password salah");
   }
 
   let isMatch = await bcrypt.compare(password, account.password);
   if (!isMatch) {
-    throw new HttpError(401, "Email atau password salah");
+    throw new HttpError(401, 103, "Email atau password salah");
   }
   const payload: TokenPayload = {
     id: account.id,
     email: account.email,
   };
   const token = jwt.generateToken(payload);
-  const response: LoginResponse = {
+  const resp: LoginResponse = {
     token,
   };
-  success<LoginResponse>(res, 200, "Login Sukses", response);
+  response<LoginResponse>(res, 200, 0, "Login Sukses", resp);
 };
 
 export default {

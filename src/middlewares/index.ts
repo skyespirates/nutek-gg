@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction, ErrorRequestHandler } from "express";
 import { z, ZodError } from "zod";
 
-import { failure } from "../utils/response";
+import { response } from "../utils/response";
 import jwt from "jsonwebtoken";
 import logger from "../utils/logger";
 import multer from "multer";
@@ -18,9 +18,9 @@ export function validateData(schema: z.ZodObject<any, any>) {
         const errorMessages = error.issues.map((issue: any) => ({
           message: `${issue.path.join(".")} is ${issue.message}`,
         }));
-        throw new HttpError(400, errorMessages[0].message);
+        throw new HttpError(400, 102, errorMessages[0].message);
       } else {
-        throw new HttpError(500, "internal server error");
+        throw new HttpError(500, 104, "internal server error");
       }
     }
   };
@@ -30,8 +30,7 @@ export function authenticate(req: Request, res: Response, next: NextFunction) {
   const authHeader = req.headers.authorization;
 
   if (!authHeader?.startsWith("Bearer ")) {
-    // throw new HttpError(401, "Authentication token missing");
-    throw new HttpError(401, "Token tidak valid atau kadaluwarsa");
+    throw new HttpError(401, 108, "Token tidak valid atau kadaluwarsa");
   }
 
   const token = authHeader.split(" ")[1];
@@ -42,10 +41,10 @@ export function authenticate(req: Request, res: Response, next: NextFunction) {
     next();
   } catch (err: any) {
     if (err.name === "TokenExpiredError") {
-      throw new HttpError(401, "Token tidak valid atau kadaluwarsa");
+      throw new HttpError(401, 108, "Token tidak valid atau kadaluwarsa");
     }
 
-    throw new HttpError(401, "Token tidak valid atau kadaluwarsa");
+    throw new HttpError(401, 108, "Token tidak valid atau kadaluwarsa");
   }
 }
 
@@ -63,17 +62,21 @@ export const errorHandler: ErrorRequestHandler = (
   res: Response,
   next: NextFunction
 ) => {
-  const { statusCode, message } = err;
+  const { code, status, message } = err;
   if (err instanceof multer.MulterError) {
-    failure(res, "Error multer cokkkk🥶");
+    response(res, 400, 104, "Error multer cokkkk🥶", null);
+    return;
   }
+
+  logger.info("check error: ", err instanceof HttpError);
 
   if (err instanceof HttpError) {
-    failure(res, message, statusCode);
+    response(res, code, status, message, null);
+    return;
   }
 
-  logger.error(err.message);
-  failure(res, "internal server error", 500);
+  logger.error("fallback: ", err.message);
+  response(res, 500, 105, "internal server error", null);
 
   next();
 };

@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { success, failure } from "../utils/response";
+import { response } from "../utils/response";
 import logger from "../utils/logger";
 import accountService from "../services/account.service";
 import {
@@ -28,11 +28,12 @@ async function createAccount(req: Request, res: Response) {
   };
   const created = await accountService.createAccount(account);
   if (!created) {
-    throw new HttpError(400, "Parameter email tidak sesuai format");
+    throw new HttpError(400, 102, "Parameter email tidak sesuai format");
   }
-  success<RegisterResponse>(
+  response<RegisterResponse>(
     res,
     201,
+    0,
     "Registrasi berhasil silahkan login",
     null
   );
@@ -49,7 +50,7 @@ async function getProfile(req: Request, res: Response) {
     profile_image: account.profile_image || "",
   };
 
-  success(res, 200, "Sukses", data);
+  response<Profile>(res, 200, 0, "Sukses", data);
 }
 
 async function updateProfile(req: Request, res: Response) {
@@ -64,7 +65,7 @@ async function updateProfile(req: Request, res: Response) {
   if (!profile.profile_image) {
     profile.profile_image = "";
   }
-  success<Profile>(res, 200, "Update Pofile berhasil", profile);
+  response<Profile>(res, 200, 0, "Update Pofile berhasil", profile);
 }
 
 async function uploadProfileImage(req: Request, res: Response) {
@@ -74,15 +75,15 @@ async function uploadProfileImage(req: Request, res: Response) {
   const profile = await accountService.updateProfileImage(imageUrl, email);
 
   if (!profile) {
-    throw new HttpError(400, "failed to upload profile image");
+    throw new HttpError(400, 102, "failed to upload profile image");
   }
-  success<Profile>(res, 200, "Update Profile Image berhasil", profile!);
+  response<Profile>(res, 200, 0, "Update Profile Image berhasil", profile!);
 }
 
 async function getBalance(req: Request, res: Response) {
   const { email } = req.user as TokenPayload;
   const balance = await accountService.getBalance(email);
-  success<Balance>(res, 200, "Get Balance Berhasil", balance);
+  response<Balance>(res, 200, 0, "Get Balance Berhasil", balance);
 }
 
 async function topup(req: Request, res: Response) {
@@ -94,7 +95,7 @@ async function topup(req: Request, res: Response) {
     // 1. update balance
     const balance = await accountService.topup(conn, email, top_up_amount);
     if (!balance) {
-      failure(res, "failed on update balance", 400);
+      response(res, 400, 102, "failed on update balance", null);
     }
 
     // 2. create invoice
@@ -105,7 +106,7 @@ async function topup(req: Request, res: Response) {
     };
     const inv = await invoiceService.create(conn, invData);
     if (!inv) {
-      failure(res, "failed on create invoice", 500);
+      response(res, 400, 10, "failed on create invoice", null);
     }
 
     // 3. save transaction
@@ -116,15 +117,21 @@ async function topup(req: Request, res: Response) {
     };
     const trx = await transactionService.save(conn, trxData);
     if (!trx) {
-      failure(res, "failed to proceed payment: on save transaction", 500);
+      response(
+        res,
+        400,
+        102,
+        "failed to proceed payment: on save transaction",
+        null
+      );
     }
 
     await conn.query("COMMIT");
-    success<Balance>(res, 200, "Top Up Balance berhasil", balance);
+    response<Balance>(res, 200, 0, "Top Up Balance berhasil", balance);
   } catch (error) {
     await conn.query("ROLLBACK");
     logger.error(error);
-    failure(res, "failed to topup", 500);
+    response(res, 500, 103, "failed to topup", null);
   } finally {
     conn.release();
   }
@@ -139,13 +146,19 @@ async function payment(req: Request, res: Response) {
     // 1. get service info
     const service = await serviceService.get(conn, service_code);
     if (!service) {
-      failure(res, "Service atau Layanan tidak ditemukan", 400);
+      response(res, 400, 102, "Service atau Layanan tidak ditemukan", null);
     }
 
     // 2. update balance
     const succeed = await accountService.payment(conn, email, service.tariff); // update balance
     if (!succeed) {
-      failure(res, "failed to proceed payment: on save payment", 500);
+      response(
+        res,
+        400,
+        102,
+        "failed to proceed payment: on save payment",
+        null
+      );
     }
 
     // 3. create invoice
@@ -156,7 +169,7 @@ async function payment(req: Request, res: Response) {
     };
     const inv = await invoiceService.create(conn, p);
     if (!inv) {
-      failure(res, "failed on create invoice", 500);
+      response(res, 400, 102, "failed on create invoice", null);
     }
 
     // 4. save transaction
@@ -168,7 +181,13 @@ async function payment(req: Request, res: Response) {
     const result = await transactionService.save(conn, data); // store transaction info
 
     if (!result) {
-      failure(res, "failed to proceed payment: on save transaction", 500);
+      response(
+        res,
+        400,
+        102,
+        "failed to proceed payment: on save transaction",
+        null
+      );
     }
 
     const resp: Payment = {
@@ -180,13 +199,13 @@ async function payment(req: Request, res: Response) {
       created_on: inv.created_on,
     };
 
-    success<Payment>(res, 200, "Transaksi berhasil", resp);
+    response<Payment>(res, 200, 0, "Transaksi berhasil", resp);
 
     await conn.query("COMMIT");
   } catch (error) {
     await conn.query("ROLLBACK");
     logger.error(error);
-    failure(res, "Saldo tidak cukup", 400);
+    response(res, 400, 102, "Saldo tidak cukup", null);
   } finally {
     conn.release();
   }

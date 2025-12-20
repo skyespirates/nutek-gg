@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { success } from "../utils/response";
+import { response } from "../utils/response";
 import { BannerResp, Service } from "../types";
 import bannerService from "../services/banner.service";
 
@@ -15,7 +15,7 @@ async function list(req: Request, res: Response) {
     resp.push(tmp);
   }
 
-  success<BannerResp[]>(res, 200, "Sukses", resp);
+  response<BannerResp[]>(res, 200, 0, "Sukses", resp);
 }
 
 export default {

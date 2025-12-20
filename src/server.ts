@@ -47,7 +47,7 @@ const upload = multer({
     if (allowedMimeTypes.includes(mime) && allowedExtensions.includes(ext)) {
       cb(null, true);
     } else {
-      cb(new HttpError(400, "Format image tidak sesuai"));
+      cb(new HttpError(400, 102, "Format image tidak sesuai"));
     }
   },
 });

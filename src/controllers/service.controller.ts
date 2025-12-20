@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import serviceService from "../services/service.service";
-import { success } from "../utils/response";
+import { response } from "../utils/response";
 import { SerivceResp, Service } from "../types";
 
 async function list(req: Request, res: Response) {
@@ -17,7 +17,7 @@ async function list(req: Request, res: Response) {
     services.push(service);
   }
 
-  success<SerivceResp[]>(res, 200, "Sukses", services);
+  response<SerivceResp[]>(res, 200, 0, "Sukses", services);
 }
 
 export default {
