@@ -10,7 +10,7 @@ import {
 import { JwtPayload } from "jsonwebtoken";
 import multer from "multer";
 import swaggerUi from "swagger-ui-express";
-import { openApiDoc } from "./docs/openapi-doc";
+import { generateOpenApiDocumentation } from "./docs/openapi-docs";
 import asyncHandler from "express-async-handler";
 
 import { TokenPayload } from "./types";
@@ -63,7 +63,11 @@ app.use(express.json());
 app.use(express.static(publicDir));
 app.use(express.static(uploadDir));
 
-app.use("/docs", swaggerUi.serve, swaggerUi.setup(openApiDoc));
+app.use(
+  "/docs",
+  swaggerUi.serve,
+  swaggerUi.setup(generateOpenApiDocumentation())
+);
 
 app.post(
   "/login",

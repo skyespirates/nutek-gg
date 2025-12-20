@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { TokenPayload, History } from "../types";
+import { TokenPayload } from "../types";
 import transactionService from "../services/transaction.service";
 import { response } from "../utils/response";
 import { z } from "zod";

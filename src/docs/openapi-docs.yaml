@@ -1,0 +1,866 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: Nutek-gg API
+  description: Documentation for Nutek-gg API
+servers:
+  - url: http://localhost:3000
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas: {}
+  parameters: {}
+paths:
+  /registration:
+    post:
+      tags:
+        - 1. Module Membership
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: skyes@email.com
+                first_name:
+                  type: string
+                  example: skyes
+                last_name:
+                  type: string
+                  example: crawford
+                password:
+                  type: string
+                  minLength: 8
+                  example: password123
+              required:
+                - email
+                - first_name
+                - last_name
+                - password
+      responses:
+        "201":
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: number
+                    example: 0
+                  message:
+                    type: string
+                    example: Registrasi berhasil silahkan login
+                  data:
+                    nullable: true
+                    example: null
+                required:
+                  - status
+                  - message
+                  - data
+        "400":
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: number
+                    example: 102
+                  message:
+                    type: string
+                    example: Parameter email tidak sesuai format
+                  data:
+                    nullable: true
+                    example: null
+                required:
+                  - status
+                  - message
+                  - data
+  /login:
+    post:
+      tags:
+        - 1. Module Membership
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: sykes@email.com
+                password:
+                  type: string
+                  minLength: 8
+                  example: password123
+              required:
+                - email
+                - password
+      responses:
+        "200":
+          description: Login user
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: number
+                    example: 0
+                  message:
+                    type: string
+                    example: Sukses
+                  data:
+                    type: object
+                    properties:
+                      token:
+                        type: string
+                        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjoiNTRVdXRjYTdCS0ZPX0ZUZGZ1bXlJem9zSTRKa1VxUGZVZ0ROSTUwelRTQlo2aHoyY0hKZ1VMb1loM09HUUd0ekQxV3dTX194aHBNZTE2SGFscVRzcEhjS21UclJ3S2FYYmZob3AzdzFFUHJ2NFdBQmk1c0RpdV9DSnZTSWt2MDFTbEU0QU5pbVB0bUx5azZoUzlOalVQNEZaVVpfRVBtcEk4Y3pNc3ZWa2JFPSIsImlhdCI6MTYyNjkyODk3MSwiZXhwIjoyNTU2MTE4Nzk4fQ.9C9NvhZYKivhGWnrjo4Wr1Rv-wur1wCm0jqfK9XDD8U
+                    required:
+                      - token
+                required:
+                  - status
+                  - message
+                  - data
+        "400":
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: number
+                    example: 102
+                  message:
+                    type: string
+                    example: Parameter email tidak sesuai format
+                  data:
+                    nullable: true
+                required:
+                  - status
+                  - message
+                  - data
+        "401":
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: number
+                    example: 103
+                  message:
+                    type: string
+                    example: Email atau password salah
+                  data:
+                    nullable: true
+                required:
+                  - status
+                  - message
+                  - data
+  /profile:
+    get:
+      tags:
+        - 1. Module Membership
+      description: Get all menus that assigned to current role
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Digunakan untuk mendapatkan informasi profile User
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: number
+                    example: 0
+                  message:
+                    type: string
+                    example: Sukses
+                  data:
+                    type: object
+                    properties:
+                      email:
+                        type: string
+                        example: skyes@email.com
+                      first_name:
+                        type: string
+                        example: skyes
+                      last_name:
+                        type: string
+                        example: crawford
+                      profile_image:
+                        type: string
+                        example: http://localhost:3000/Skyes.jpg
+                    required:
+                      - email
+                      - first_name
+                      - last_name
+                      - profile_image
+                required:
+                  - status
+                  - message
+                  - data
+        "401":
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: number
+                    example: 108
+                  message:
+                    type: string
+                    example: Token tidak valid atau kadaluawarsa
+                  data:
+                    nullable: true
+                    example: null
+                required:
+                  - status
+                  - message
+                  - data
+  /profile/update:
+    put:
+      tags:
+        - 1. Module Membership
+      description: Digunakan untuk mengupdate data profile User
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                first_name:
+                  type: string
+                  example: Mikasa
+                last_name:
+                  type: string
+                  example: Ackerman
+              required:
+                - first_name
+                - last_name
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: number
+                    example: 0
+                  message:
+                    type: string
+                    example: Update profile berhasil
+                  data:
+                    type: object
+                    properties:
+                      email:
+                        type: string
+                        example: skyes@email.com
+                      first_name:
+                        type: string
+                        example: skyes
+                      last_name:
+                        type: string
+                        example: crawford
+                      profile_image:
+                        type: string
+                        example: http://localhost:3000/Skyes.jpg
+                    required:
+                      - email
+                      - first_name
+                      - last_name
+                      - profile_image
+                required:
+                  - status
+                  - message
+                  - data
+        "401":
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: number
+                    example: 108
+                  message:
+                    type: string
+                    example: Token tidak valid atau kadaluawarsa
+                  data:
+                    nullable: true
+                    example: null
+                required:
+                  - status
+                  - message
+                  - data
+  /profile/image:
+    put:
+      tags:
+        - 1. Module Membership
+      description: Digunakan untuk mengupdate / upload profile image User
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: File to upload
+              required:
+                - file
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: number
+                    example: 0
+                  message:
+                    type: string
+                    example: Update profile image berhasil
+                  data:
+                    type: object
+                    properties:
+                      email:
+                        type: string
+                        example: skyes@email.com
+                      first_name:
+                        type: string
+                        example: skyes
+                      last_name:
+                        type: string
+                        example: crawford
+                      profile_image:
+                        type: string
+                        example: http://localhost:3000/Skyes.jpg
+                    required:
+                      - email
+                      - first_name
+                      - last_name
+                      - profile_image
+                required:
+                  - status
+                  - message
+                  - data
+        "400":
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: number
+                    example: 102
+                  message:
+                    type: string
+                    example: Format image tidak sesuai
+                  data:
+                    nullable: true
+                    example: null
+                required:
+                  - status
+                  - message
+        "401":
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: number
+                    example: 108
+                  message:
+                    type: string
+                    example: Token tidak valid atau kadaluawarsa
+                  data:
+                    nullable: true
+                    example: null
+                required:
+                  - status
+                  - message
+                  - data
+  /banner:
+    get:
+      tags:
+        - 2. Module Information
+      description: Digunakan untuk mendapatkan list banner
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: number
+                    example: 0
+                  message:
+                    type: string
+                    example: Sukses
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        banner_name:
+                          type: string
+                          example: Banner 1
+                        banner_image:
+                          type: string
+                          example: http://localhost:3000/banner-1.jpg
+                        description:
+                          type: string
+                          example: Lerem Ipsum Dolor sit amet
+                      required:
+                        - banner_name
+                        - banner_image
+                        - description
+                required:
+                  - status
+                  - message
+                  - data
+  /services:
+    get:
+      tags:
+        - 2. Module Information
+      security:
+        - bearerAuth: []
+      description: Digunakan untuk mendapatkan list Service/Layanan PPOB
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: number
+                    example: 0
+                  message:
+                    type: string
+                    example: Sukses
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        service_code:
+                          type: string
+                          example: PAJAK
+                        service_name:
+                          type: string
+                          example: Pajak PBB
+                        service_icon:
+                          type: string
+                          example: http://localhost:3000/pajak-pbb.jpg
+                        service_tariff:
+                          type: number
+                          example: 40000
+                      required:
+                        - service_code
+                        - service_name
+                        - service_icon
+                        - service_tariff
+                required:
+                  - status
+                  - message
+                  - data
+        "401":
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: number
+                    example: 108
+                  message:
+                    type: string
+                    example: Token tidak valid atau kadaluawarsa
+                  data:
+                    nullable: true
+                    example: null
+                required:
+                  - status
+                  - message
+                  - data
+  /balance:
+    get:
+      tags:
+        - 3. Module Transaction
+      description: Digunakan untuk mendapatkan informasi balance / saldo terakhir dari User
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: number
+                    example: 0
+                  message:
+                    type: string
+                    example: Get balance berhasil
+                  data:
+                    type: object
+                    properties:
+                      balance:
+                        type: number
+                        example: 1250000
+                    required:
+                      - balance
+                required:
+                  - status
+                  - message
+                  - data
+        "401":
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: number
+                    example: 108
+                  message:
+                    type: string
+                    example: Token tidak valid atau kadaluawarsa
+                  data:
+                    nullable: true
+                    example: null
+                required:
+                  - status
+                  - message
+                  - data
+  /topup:
+    post:
+      tags:
+        - 3. Module Transaction
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                top_up_amount:
+                  type: number
+                  example: "325000"
+              required:
+                - top_up_amount
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: number
+                    example: 0
+                  message:
+                    type: string
+                    example: Top up balance berhasil
+                  data:
+                    type: object
+                    properties:
+                      balance:
+                        type: number
+                        example: 1250000
+                    required:
+                      - balance
+                required:
+                  - status
+                  - message
+                  - data
+        "400":
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: number
+                    example: 102
+                  message:
+                    type: string
+                    example: Parameter amount hanya boleh angka dan tidak boleh lebih kecil dari 0
+                  data:
+                    nullable: true
+                    example: null
+                required:
+                  - status
+                  - message
+        "401":
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: number
+                    example: 108
+                  message:
+                    type: string
+                    example: Token tidak valid atau kadaluawarsa
+                  data:
+                    nullable: true
+                    example: null
+                required:
+                  - status
+                  - message
+                  - data
+  /transaction:
+    post:
+      tags:
+        - 3. Module Transaction
+      description: Digunakan untuk melakukan transaksi dari services / layanan yang tersedia
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                service_code:
+                  type: string
+                  example: PDAM
+              required:
+                - service_code
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: number
+                    example: 0
+                  message:
+                    type: string
+                    example: Transaksi berhasil
+                  data:
+                    type: object
+                    properties:
+                      invoice_number:
+                        type: string
+                        example: INV17082023-001
+                      service_code:
+                        type: string
+                        example: PLN_PRABAYAR
+                      service_name:
+                        type: string
+                        example: PLN Prabayar
+                      transaction_type:
+                        type: string
+                        example: PAYMENT
+                      total_amount:
+                        type: number
+                        example: 20000
+                      created_on:
+                        type: string
+                        example: 2023-08-17T10:10:10.000Z
+                    required:
+                      - invoice_number
+                      - service_code
+                      - service_name
+                      - transaction_type
+                      - total_amount
+                      - created_on
+                required:
+                  - status
+                  - message
+                  - data
+        "400":
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: number
+                    example: 102
+                  message:
+                    type: string
+                    example: Service atau Layanan tidak ditemukan
+                  data:
+                    nullable: true
+                    example: null
+                required:
+                  - status
+                  - message
+        "401":
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: number
+                    example: 108
+                  message:
+                    type: string
+                    example: Token tidak valid atau kadaluawarsa
+                  data:
+                    nullable: true
+                    example: null
+                required:
+                  - status
+                  - message
+                  - data
+  /transaction/history:
+    get:
+      tags:
+        - 3. Module Transaction
+      description: Digunakan untuk mendapatkan informasi history transaksi
+      security:
+        - bearerAuth: []
+      parameters:
+        - schema:
+            type: number
+            nullable: true
+            minimum: 0
+            default: 0
+          required: false
+          name: offset
+          in: query
+        - schema:
+            type: number
+            minimum: 1
+            default: 3
+          required: false
+          name: limit
+          in: query
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: number
+                    example: 0
+                  message:
+                    type: string
+                    example: Sukses
+                  data:
+                    type: object
+                    properties:
+                      offset:
+                        type: number
+                        minimum: 0
+                        example: 0
+                      limit:
+                        type: number
+                        minimum: 1
+                        example: 3
+                      records:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            invoice_number:
+                              type: string
+                              example: INV17082023-001
+                            transaction_type:
+                              type: string
+                              example: PAYMENT
+                            description:
+                              type: string
+                              example: Top Up Balance
+                            total_amount:
+                              type: number
+                              example: 100000
+                            created_on:
+                              type: string
+                              example: 2023-08-17T10:10:10.000Z
+                          required:
+                            - invoice_number
+                            - transaction_type
+                            - description
+                            - total_amount
+                            - created_on
+                        example:
+                          - invoice_number: INV17082023-001
+                            transaction_type: TOPUP
+                            description: Top Up balance
+                            total_amount: 100000
+                            created_on: 2023-08-17T10:10:10.000Z
+                    required:
+                      - offset
+                      - limit
+                      - records
+                required:
+                  - status
+                  - message
+                  - data
+        "401":
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: number
+                    example: 108
+                  message:
+                    type: string
+                    example: Token tidak valid atau kadaluawarsa
+                  data:
+                    nullable: true
+                    example: null
+                required:
+                  - status
+                  - message
+                  - data

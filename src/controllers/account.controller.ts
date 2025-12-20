@@ -7,7 +7,6 @@ import {
   InvoicePayload,
   NewAccount,
   Payment,
-  Profile,
   TokenPayload,
   TransactionPayload,
 } from "../types";
@@ -17,6 +16,7 @@ import transactionService from "../services/transaction.service";
 import invoiceService from "../services/invoice.service";
 import { HttpError } from "../utils/http-error";
 import { RegisterResponse } from "../schemas/register.schema";
+import { Profile } from "../schemas/profile.schema";
 
 async function createAccount(req: Request, res: Response) {
   const { email, first_name, last_name, password } = req.body;

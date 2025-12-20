@@ -1,5 +1,4 @@
 import { ZodType, z } from "zod";
-
 import { extendZodWithOpenApi } from "@asteasolutions/zod-to-openapi";
 
 extendZodWithOpenApi(z);
@@ -16,8 +15,3 @@ export function ApiResponse<T extends ZodType>(dataSchema: T, meta?: Meta) {
     data: dataSchema,
   });
 }
-
-export const UnauthorizedSchema = ApiResponse(z.null(), {
-  status: 108,
-  message: "Token tidak valid atau kadaluawarsa",
-});

@@ -1,7 +1,4 @@
 import { OpenAPIRegistry } from "@asteasolutions/zod-to-openapi";
-
-export const registry = new OpenAPIRegistry();
-
 import { UploadFileSchema } from "../schemas";
 import z from "zod";
 import {
@@ -15,7 +12,30 @@ import {
   RegisterResponseSchema,
   RegistrationPayloadSchema,
 } from "../schemas/register.schema";
-import { TransactionHistoryResponseSchema } from "../schemas/transaction.schema";
+import {
+  BalanceResponseSchema,
+  TopupPayload,
+  TopupResponseSchema,
+  TransactionHistoryResponseSchema,
+  TransactionPayloadSchema,
+  TransactionResponseSchema,
+} from "../schemas/transaction.schema";
+import {
+  InvalidImageFormatSchema,
+  InvalidServiceSchema,
+  InvalidTopupNominalSchema,
+  UnauthorizedSchema,
+} from "../schemas/error.schema";
+import {
+  ProfileResponseSchema,
+  UpdateProfileImageResponseSchema,
+  UpdateProfilePayload,
+  UpdateProfileResponseSchema,
+} from "../schemas/profile.schema";
+import { BannerResponseSchema } from "../schemas/banner.schema";
+import { ServiceResponseSchema } from "../schemas/service.schema";
+
+export const registry = new OpenAPIRegistry();
 
 registry.registerComponent("securitySchemes", "bearerAuth", {
   type: "http",
@@ -108,15 +128,7 @@ registry.registerPath({
       description: "Digunakan untuk mendapatkan informasi profile User",
       content: {
         "application/json": {
-          schema: {
-            type: "object",
-            properties: {
-              text: {
-                type: "string",
-                example: "hello world",
-              },
-            },
-          },
+          schema: ProfileResponseSchema,
         },
       },
     },
@@ -124,23 +136,7 @@ registry.registerPath({
       description: "",
       content: {
         "application/json": {
-          schema: {
-            type: "object",
-            properties: {
-              status: {
-                type: "number",
-                example: 108,
-              },
-              message: {
-                type: "string",
-                example: "Token tidak valid atau kadaluwarsa",
-              },
-              data: {
-                type: "null",
-                example: null,
-              },
-            },
-          },
+          schema: UnauthorizedSchema,
         },
       },
     },
@@ -158,19 +154,7 @@ registry.registerPath({
     body: {
       content: {
         "application/json": {
-          schema: {
-            type: "object",
-            properties: {
-              first_name: {
-                type: "string",
-                example: "skyes",
-              },
-              last_name: {
-                type: "string",
-                example: "crawford",
-              },
-            },
-          },
+          schema: UpdateProfilePayload,
         },
       },
     },
@@ -180,23 +164,7 @@ registry.registerPath({
       description: "",
       content: {
         "application/json": {
-          schema: {
-            type: "object",
-            properties: {
-              status: {
-                type: "number",
-                example: 0,
-              },
-              message: {
-                type: "string",
-                example: "Update Profile berhasil",
-              },
-              data: {
-                type: "object",
-                properties: {},
-              },
-            },
-          },
+          schema: UpdateProfileResponseSchema,
         },
       },
     },
@@ -204,23 +172,7 @@ registry.registerPath({
       description: "",
       content: {
         "application/json": {
-          schema: {
-            type: "object",
-            properties: {
-              status: {
-                type: "number",
-                example: 108,
-              },
-              message: {
-                type: "string",
-                example: "Token tidak tidak valid atau kadaluwarsa",
-              },
-              data: {
-                type: "null",
-                example: null,
-              },
-            },
-          },
+          schema: UnauthorizedSchema,
         },
       },
     },
@@ -247,40 +199,7 @@ registry.registerPath({
       description: "",
       content: {
         "application/json": {
-          schema: {
-            type: "object",
-            properties: {
-              status: {
-                type: "number",
-                example: 0,
-              },
-              message: {
-                type: "string",
-                example: "Update profile image berhasil",
-              },
-              data: {
-                type: "object",
-                properties: {
-                  email: {
-                    type: "string",
-                    example: "skyes@email.com",
-                  },
-                  first_name: {
-                    type: "string",
-                    example: "skyes",
-                  },
-                  last_name: {
-                    type: "string",
-                    example: "crawford",
-                  },
-                  profile_image: {
-                    type: "string",
-                    example: "nutek-gg-production.up.railway.app/image.jpeg",
-                  },
-                },
-              },
-            },
-          },
+          schema: UpdateProfileImageResponseSchema,
         },
       },
     },
@@ -288,23 +207,7 @@ registry.registerPath({
       description: "",
       content: {
         "application/json": {
-          schema: {
-            type: "object",
-            properties: {
-              status: {
-                type: "number",
-                example: 102,
-              },
-              message: {
-                type: "string",
-                example: "Format image tidak sesuai",
-              },
-              data: {
-                type: "null",
-                example: null,
-              },
-            },
-          },
+          schema: InvalidImageFormatSchema,
         },
       },
     },
@@ -312,23 +215,7 @@ registry.registerPath({
       description: "",
       content: {
         "application/json": {
-          schema: {
-            type: "object",
-            properties: {
-              status: {
-                type: "number",
-                example: 108,
-              },
-              message: {
-                type: "string",
-                example: "Token tidak tidak valid atau kadaluwarsa",
-              },
-              data: {
-                type: "null",
-                example: null,
-              },
-            },
-          },
+          schema: UnauthorizedSchema,
         },
       },
     },
@@ -345,39 +232,7 @@ registry.registerPath({
       description: "",
       content: {
         "application/json": {
-          schema: {
-            type: "object",
-            properties: {
-              status: {
-                type: "number",
-                example: 0,
-              },
-              message: {
-                type: "string",
-                example: "Sukses",
-              },
-              data: {
-                type: "array",
-                items: {
-                  type: "object",
-                  properties: {
-                    banner_name: {
-                      type: "string",
-                      example: "Banner 1",
-                    },
-                    banner_image: {
-                      type: "string",
-                      example: "nutek-gg-production.up.railway.app/image.jpeg",
-                    },
-                    description: {
-                      type: "string",
-                      example: "Lorem ipsum dolor sir amet",
-                    },
-                  },
-                },
-              },
-            },
-          },
+          schema: BannerResponseSchema,
         },
       },
     },
@@ -395,43 +250,7 @@ registry.registerPath({
       description: "",
       content: {
         "application/json": {
-          schema: {
-            type: "object",
-            properties: {
-              status: {
-                type: "number",
-                example: 0,
-              },
-              message: {
-                type: "string",
-                example: "Sukses",
-              },
-              data: {
-                type: "array",
-                items: {
-                  type: "object",
-                  properties: {
-                    service_code: {
-                      type: "string",
-                      example: "PAJAK",
-                    },
-                    service_name: {
-                      type: "string",
-                      example: "Pajak PBB",
-                    },
-                    service_icon: {
-                      type: "string",
-                      example: "nutek-gg-production.up.railway.app/image.jpeg",
-                    },
-                    service_tariff: {
-                      type: "number",
-                      example: 40000,
-                    },
-                  },
-                },
-              },
-            },
-          },
+          schema: ServiceResponseSchema,
         },
       },
     },
@@ -439,23 +258,7 @@ registry.registerPath({
       description: "",
       content: {
         "application/json": {
-          schema: {
-            type: "object",
-            properties: {
-              status: {
-                type: "number",
-                example: 108,
-              },
-              message: {
-                type: "string",
-                example: "Token tidak tidak valid atau kadaluwarsa",
-              },
-              data: {
-                type: "null",
-                example: null,
-              },
-            },
-          },
+          schema: UnauthorizedSchema,
         },
       },
     },
@@ -474,28 +277,7 @@ registry.registerPath({
       description: "",
       content: {
         "application/json": {
-          schema: {
-            type: "object",
-            properties: {
-              status: {
-                type: "number",
-                example: 0,
-              },
-              message: {
-                type: "string",
-                example: "Get Balance Berhasil",
-              },
-              data: {
-                type: "object",
-                properties: {
-                  balance: {
-                    type: "number",
-                    example: 540000,
-                  },
-                },
-              },
-            },
-          },
+          schema: BalanceResponseSchema,
         },
       },
     },
@@ -503,23 +285,7 @@ registry.registerPath({
       description: "",
       content: {
         "application/json": {
-          schema: {
-            type: "object",
-            properties: {
-              status: {
-                type: "number",
-                example: 108,
-              },
-              message: {
-                type: "string",
-                example: "Token tidak tidak valid atau kadaluwarsa",
-              },
-              data: {
-                type: "null",
-                example: null,
-              },
-            },
-          },
+          schema: UnauthorizedSchema,
         },
       },
     },
@@ -535,15 +301,7 @@ registry.registerPath({
     body: {
       content: {
         "application/json": {
-          schema: {
-            type: "object",
-            properties: {
-              top_up_amount: {
-                type: "number",
-                example: 150000,
-              },
-            },
-          },
+          schema: TopupPayload,
         },
       },
     },
@@ -553,19 +311,7 @@ registry.registerPath({
       description: "",
       content: {
         "application/json": {
-          schema: {
-            type: "object",
-            properties: {
-              status: { type: "number", example: 0 },
-              message: { type: "string", example: "Top Up Balance Berhasil" },
-              data: {
-                type: "object",
-                properties: {
-                  balance: { type: "number", example: 150000 },
-                },
-              },
-            },
-          },
+          schema: TopupResponseSchema,
         },
       },
     },
@@ -573,24 +319,7 @@ registry.registerPath({
       description: "",
       content: {
         "application/json": {
-          schema: {
-            type: "object",
-            properties: {
-              status: {
-                type: "number",
-                example: 102,
-              },
-              message: {
-                type: "string",
-                example:
-                  "Paramter amount hanya boleh angka dan tidak boleh lebih kecil dari 0",
-              },
-              data: {
-                type: "null",
-                example: null,
-              },
-            },
-          },
+          schema: InvalidTopupNominalSchema,
         },
       },
     },
@@ -598,23 +327,7 @@ registry.registerPath({
       description: "",
       content: {
         "application/json": {
-          schema: {
-            type: "object",
-            properties: {
-              status: {
-                type: "number",
-                example: 108,
-              },
-              message: {
-                type: "string",
-                example: "Token tidak tidak valid atau kadaluwarsa",
-              },
-              data: {
-                type: "null",
-                example: null,
-              },
-            },
-          },
+          schema: UnauthorizedSchema,
         },
       },
     },
@@ -632,15 +345,7 @@ registry.registerPath({
     body: {
       content: {
         "application/json": {
-          schema: {
-            type: "object",
-            properties: {
-              service_code: {
-                type: "string",
-                example: "PULSA",
-              },
-            },
-          },
+          schema: TransactionPayloadSchema,
         },
       },
     },
@@ -650,30 +355,7 @@ registry.registerPath({
       description: "",
       content: {
         "application/json": {
-          schema: {
-            type: "object",
-            properties: {
-              status: { type: "number", example: 0 },
-              message: { type: "string", example: "Transaksi Berhasil" },
-              data: {
-                type: "object",
-                properties: {
-                  invoice_number: {
-                    type: "string",
-                    example: "INV17082023-001",
-                  },
-                  service_code: { type: "string", example: "PLN_PRABAYAR" },
-                  service_name: { type: "string", example: "PLN Prabayar" },
-                  transaction_type: { type: "string", example: "PAYMENT" },
-                  total_amount: { type: "number", example: 10000 },
-                  created_on: {
-                    type: "string",
-                    example: "2023-08-17T10:10:10.000Z",
-                  },
-                },
-              },
-            },
-          },
+          schema: TransactionResponseSchema,
         },
       },
     },
@@ -681,23 +363,7 @@ registry.registerPath({
       description: "",
       content: {
         "application/json": {
-          schema: {
-            type: "object",
-            properties: {
-              status: {
-                type: "number",
-                example: 102,
-              },
-              message: {
-                type: "string",
-                example: "Service ataus Layanan tidak ditemukan",
-              },
-              data: {
-                type: "null",
-                example: null,
-              },
-            },
-          },
+          schema: InvalidServiceSchema,
         },
       },
     },
@@ -705,23 +371,7 @@ registry.registerPath({
       description: "",
       content: {
         "application/json": {
-          schema: {
-            type: "object",
-            properties: {
-              status: {
-                type: "number",
-                example: 108,
-              },
-              message: {
-                type: "string",
-                example: "Token tidak tidak valid atau kadaluwarsa",
-              },
-              data: {
-                type: "null",
-                example: null,
-              },
-            },
-          },
+          schema: UnauthorizedSchema,
         },
       },
     },
@@ -753,23 +403,7 @@ registry.registerPath({
       description: "",
       content: {
         "application/json": {
-          schema: {
-            type: "object",
-            properties: {
-              status: {
-                type: "number",
-                example: 108,
-              },
-              message: {
-                type: "string",
-                example: "Token tidak tidak valid atau kadaluwarsa",
-              },
-              data: {
-                type: "null",
-                example: null,
-              },
-            },
-          },
+          schema: UnauthorizedSchema,
         },
       },
     },
