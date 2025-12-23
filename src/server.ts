@@ -25,6 +25,8 @@ import { HttpError } from "./utils/http-error";
 import { LoginPayloadSchema } from "./schemas/login.schema";
 import { RegistrationPayloadSchema } from "./schemas/register.schema";
 
+import { env } from "./configs/env";
+
 const publicDir = path.join(__dirname, "../public");
 const uploadDir = path.join(__dirname, "uploads");
 
@@ -53,7 +55,7 @@ const upload = multer({
 });
 
 const app = express();
-const port = process.env.PORT || 8080;
+const port = env.PORT;
 
 app.set("trust proxy", true);
 

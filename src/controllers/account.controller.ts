@@ -17,6 +17,7 @@ import invoiceService from "../services/invoice.service";
 import { HttpError } from "../utils/http-error";
 import { RegisterResponse } from "../schemas/register.schema";
 import { Profile } from "../schemas/profile.schema";
+import { getBaseUrl } from "../configs";
 
 async function createAccount(req: Request, res: Response) {
   const { email, first_name, last_name, password } = req.body;
@@ -70,8 +71,7 @@ async function updateProfile(req: Request, res: Response) {
 
 async function uploadProfileImage(req: Request, res: Response) {
   const { email } = req.user as TokenPayload;
-  const baseUrl = process.env.API_BASE_URL!;
-  const imageUrl = `${baseUrl}/${req.file?.originalname}`;
+  const imageUrl = `${getBaseUrl()}/${req.file?.originalname}`;
   const profile = await accountService.updateProfileImage(imageUrl, email);
 
   if (!profile) {

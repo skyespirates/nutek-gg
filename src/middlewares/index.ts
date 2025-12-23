@@ -7,6 +7,7 @@ import logger from "../utils/logger";
 import multer from "multer";
 import { TokenPayload } from "../types";
 import { HttpError } from "../utils/http-error";
+import { env } from "../configs/env";
 
 export function validateData(schema: z.ZodObject<any, any>) {
   return (req: Request, res: Response, next: NextFunction) => {
@@ -36,7 +37,7 @@ export function authenticate(req: Request, res: Response, next: NextFunction) {
   const token = authHeader.split(" ")[1];
 
   try {
-    const payload = jwt.verify(token, process.env.JWT_SECRET!);
+    const payload = jwt.verify(token, env.JWT_SECRET);
     req.user = payload as TokenPayload;
     next();
   } catch (err: any) {
